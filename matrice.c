@@ -13,35 +13,21 @@ sem_t empty, full;
 
 typedef struct {
     int row;
-} thread_args;
-
-#define BUFFER_SIZE MAX_ROWS * MAX_COLS
-int buffer[BUFFER_SIZE];
-int buffer_index = 0;
-
-void push_to_buffer(int value) {
-    buffer[buffer_index++] = value;
-}
-
-int pop_from_buffer() {
-    return buffer[--buffer_index];
-}
+} ThreadArgs;
 
 void fill_matrix_random(int rows, int cols, int matrix[MAX_ROWS][MAX_COLS]) {
     int i, j;
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
-            matrix[i][j] = rand() % 10; // Fill with random values between 0 and 9
+            matrix[i][j] = rand() % 10; // Remplir avec des valeurs aléatoires entre 0 et 9
         }
     }
 }
 
 void *producer(void *arg) {
-    thread_args *args = (thread_args *)arg;
+    ThreadArgs *args = (ThreadArgs *)arg;
     int j, k;
     int sum;
-
-    sem_wait(&empty);
 
     for (j = 0; j < MAX_COLS; j++) {
         sum = 0;
@@ -49,25 +35,28 @@ void *producer(void *arg) {
             sum += B[args->row][k] * C[k][j];
         }
         T[args->row][j] = sum;
-        push_to_buffer(sum);
     }
 
     sem_post(&full);
+
+    free(args); // Libérer la mémoire ici
 
     return NULL;
 }
 
 void *consumer(void *arg) {
-    thread_args *args = (thread_args *)arg;
+    ThreadArgs *args = (ThreadArgs *)arg;
     int j;
 
     sem_wait(&full);
 
     for (j = 0; j < MAX_COLS; j++) {
-        A[args->row][j] = pop_from_buffer();
+        A[args->row][j] = T[args->row][j];
     }
 
     sem_post(&empty);
+
+    free(args); // Libérer la mémoire ici
 
     return NULL;
 }
@@ -94,17 +83,20 @@ int main() {
     fill_matrix_random(rows_c, cols_c, C);
 
     // Initialize semaphores
-    sem_init(&empty, 0, 1);
+    sem_init(&empty, 0, THREADS);
     sem_init(&full, 0, 0);
 
     // Create threads
     for (i = 0; i < THREADS; i++) {
-        thread_args *args = malloc(sizeof(thread_args));
-        args->row = i;
-        if (pthread_create(&threads[i], NULL, producer, args) != 0) {
+        ThreadArgs *prod_args = malloc(sizeof(ThreadArgs));
+        prod_args->row = i;
+        if (pthread_create(&threads[i], NULL, producer, prod_args) != 0) {
             perror("pthread_create error (producer) !");
         }
-        if (pthread_create(&threads[i + THREADS], NULL, consumer, args) != 0) {
+
+        ThreadArgs *cons_args = malloc(sizeof(ThreadArgs));
+        cons_args->row = i;
+        if (pthread_create(&threads[i + THREADS], NULL, consumer, cons_args) != 0) {
             perror("pthread_create error (consumer) !");
         }
     }
