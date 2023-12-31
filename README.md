@@ -1,5 +1,5 @@
 # projet SE:
-* Les Questions :
+# Les Questions :
   
 Q1 : Quelles sont les structures de données à utiliser ?
 Pour représenter les données dans le programme, des structures de données spécifiques sont utilisées. Les matrices B, C et A, nécessaires pour effectuer la multiplication matricielle, sont stockées sous forme de tableaux bidimensionnels, En ce qui concerne la communication entre les fils, un tampon circulaire est employé. Ce tampon est implémenté sous la forme d'un tableau de structures.
