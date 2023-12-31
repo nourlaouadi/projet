@@ -1,30 +1,7 @@
-# projet
-projet système d'exploitation
+# projet SE:
+Q1 : Quelles sont les structures de données à utiliser ? Pour représenter les données dans le programme, des structures de données spécifiques sont utilisées. Les matrices B, C et A, nécessaires pour effectuer la multiplication matricielle, sont stockées sous forme de tableaux bidimensionnels, En ce qui concerne la communication entre les fils, un tampon circulaire est employé. Ce tampon est implémenté sous la forme d'un tableau de structures.
 
-On veut effectuer en parallèle(En utilisant le modèle producteurs/consommateur) le produit de deux matrices: 
-B (n1* m1)  et C (n2 * m2) ⇒ la matrice résultante A=B*C ;
+Q2 : Comment allez-vous protéger l'accès à ces données ? Pour garantir l'intégrité des données partagées entre les threads, l'accès aux sections critiques est sécurisé par l'utilisation de verrous, également connus sous le nom de mutex. Ces verrous permettent d'assurer une exécution atomique des opérations dans les sections où les threads accèdent et modifient les données partagées, telles que le tampon circulaire T. Les threads doivent adopter le verrou avant d'accéder aux données partagées et le relâcher une fois les opérations terminées.
 
-Les matrices sont remplis par des valeurs aléatoires
-
-Les résultats intermédiaires seront placés dans un tampon de taille “T[N]”.
-
-Chaque threads producteurs calcule une ligne de la matrice résultante A et range les résultat dans le tampon T
-
-Les threads consommateurs consomment l'élément T[y]  le place dans la matrice résultante A  au bon emplacement!
-
-q1: Quelles sont les structures de données à utiliser ?
-
-q2: Comment allez-vous protéger l'accès à ces données?
-
-q3- quels sont les risques?
-
-1-Cloner le projet github : projet  ; et le modifier le selon les exigences ci-dessus
-
-2- Pour chaque nouvelle idée créer une nouvelle branche; les autres étudiants peuvent améliorer l'idée en créant une nouvelle branche!
-
-3-Les premières réponses sont mieux notées!
-
-4-Bien gérer les éxceptions 
-
-5-Bien gérer les messages d'erreurs!
+Q3 : Quels sont les risques ? il existe plusieurs points à considérer. Premièrement, des blocages peuvent se produire si les verrous ne sont pas acquis et relâchés correctement, entraînant un blocage des threads. Deuxièmement, des conditions de concurrence peuvent survenir si la synchronisation entre les threads n'est pas correctement gérée, entraînant des résultats incorrects. Enfin, des problèmes de performance peuvent apparaître si la taille du tampon n'est pas optimale ou si la répartition des tâches entre les threads est inadéquate, impactant ainsi les performances globales du programme.
 
